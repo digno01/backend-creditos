@@ -160,17 +160,5 @@ public class KafkaConfig {
                 ))
                 .build();
     }
-
-    // Topic para DLQ (Dead Letter Queue)
-    @Bean
-    public NewTopic creditosDlqTopic() {
-        return TopicBuilder.name("creditos-dlq")
-                .partitions(1)
-                .replicas(1)
-                .configs(Map.of(
-                        "retention.ms", "2592000000", // 30 dias
-                        "segment.ms", "86400000"      // 1 dia
-                ))
-                .build();
-    }
 }
+

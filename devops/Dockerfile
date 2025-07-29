@@ -1,7 +1,7 @@
-FROM openjdk:17-jdk-slim AS builder
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
 # Instalar Maven
-RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache maven
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY ../src ./src
 RUN mvn clean package -DskipTests
 
 # Imagem final para runtime
-FROM openjdk:17-jre-slim
+FROM eclipse-temurin:17-jre-alpine
 
 # Criar diretório para logs
 RUN mkdir -p /app/logs
@@ -27,7 +27,7 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Configurações de JVM otimizadas para Java 17
-ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:+UseStringDeduplication"
+ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -XX:G1HeapRegionSize=16m -XX:+UseStringDeduplication --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
 
 # Comando para executar a aplicação
 CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
